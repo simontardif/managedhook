@@ -3,7 +3,8 @@ Managed Hook allows you to hook any methods with a handler that is called before
 
 How to use:
 
-1- Create a class that implements this interface IHookerHandler
+1- Create a class that implements this interface IHookerHandler:
+
 public class MyHookHandler : IHookHandler
 {
     public void Before(object instanceHooked)
