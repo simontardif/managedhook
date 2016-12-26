@@ -3,7 +3,7 @@ Managed Hook allows you to hook any methods with a handler that is called before
 
 How to use:
 
-1- Create a class that implements this interface IHookerHandler:
+1- Create a class that implements the interface IHookerHandler:
 
 ```cs
 public class MyHookHandler : IHookHandler
@@ -21,11 +21,16 @@ public class MyHookHandler : IHookHandler
 ```
 
 2- Get the methodInfo for the method to be hooked:
-
+```cs
 MethodInfo methodHooked = typeof(Foo).GetMethod("MethodHooked");
+```
 
 3- Hook the method!
+```cs
 HookManager.Instance.HookFunction(methodHooked, new MyHookHandler());
+```
 
 4 - (opt) When finished, you can unhook the method:
+```cs
 HookManager.Instance.UnHookFunction(methodHooked);
+```
