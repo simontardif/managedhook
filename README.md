@@ -4,7 +4,8 @@ Managed Hook allows you to hook any methods with a handler that is called before
 How to use:
 
 1- Create a class that implements this interface IHookerHandler:
-...cs
+
+```cs
 public class MyHookHandler : IHookHandler
 {
     public void Before(object instanceHooked)
@@ -17,7 +18,8 @@ public class MyHookHandler : IHookHandler
         // do whatever you want here
     }
 }
-...
+```
+
 2- Get the methodInfo for the method to be hooked:
 
 MethodInfo methodHooked = typeof(Foo).GetMethod("MethodHooked");
