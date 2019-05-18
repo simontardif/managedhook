@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ManagedHook</id>
+    <version>1.0.0</version>
+    <authors>Simon Tardif-Morneau</authors>
+    <owners>Simon Tardif-Morneau</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Managed Hook allows you to hook any methods with a handler that is called when the method hooked is called.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags></tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+	<file src="ManagedHook\bin\Release\*.*" target="lib\net45"/>
+  </files>
+</package>
