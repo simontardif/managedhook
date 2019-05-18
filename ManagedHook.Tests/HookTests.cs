@@ -55,6 +55,8 @@ namespace ManagedHook.Tests
             HookManager.Instance.ReplaceFunction(addMethod, functionReplacer);
 
             addMethod.Invoke(automationEvents, new[] { new object() });
+
+            Assert.AreEqual(1, functionReplacer.CallsCount);
         }
 
         #region Tests
