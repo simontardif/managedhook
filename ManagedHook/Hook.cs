@@ -222,7 +222,7 @@ namespace ManagedHook
             CSharpCodeProvider provider = new CSharpCodeProvider();
             CompilerParameters parameters = new CompilerParameters();
 
-            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic).ToList();
             foreach (var loadedAssembly in loadedAssemblies)
             {
                 parameters.ReferencedAssemblies.Add(loadedAssembly.Location);
