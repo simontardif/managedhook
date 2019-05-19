@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/simontardif/managedhook.svg?branch=master)](https://travis-ci.com/simontardif/managedhook)
 [![NuGet](https://img.shields.io/nuget/v/ManagedHook.svg)](https://www.nuget.org/packages/ManagedHook)
 # ManagedHook
-Managed Hook allows you to hook any methods with a handler that is called before and after the method hooked is called.
+Managed Hook allows you to hook any methods with a handler that is called before and after the hooked method is called.
 
 How to use:
 
