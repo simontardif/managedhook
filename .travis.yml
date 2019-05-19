@@ -5,6 +5,6 @@ node_js:
 mono: latest
 dotnet: 2.1.301
 install:
-  - nuget restore -source "https://www.nuget.org/api/v2" ./ManagedHook.sln
+  - nuget restore ./ManagedHook.sln
 script:
   - msbuild /p:Configuration=Release ./ManagedHook.sln
