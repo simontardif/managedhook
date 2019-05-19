@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/simontardif/managedhook.svg?branch=master)](https://travis-ci.com/simontardif/managedhook)
 # ManagedHook
 Managed Hook allows you to hook any methods with a handler that is called before and after the method hooked is called.
 
@@ -8,12 +9,12 @@ How to use:
 ```cs
 public class MyHookHandler : IHookHandler
 {
-    public void Before(object instanceHooked)
+    public void Before(object instanceHooked, object[] parameters)
     {
         // do whatever you want here
     }
     
-    public void After(object instanceHooked)
+    public void After(object instanceHooked, object[] parameters)
     {
         // do whatever you want here
     }

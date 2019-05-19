@@ -1,0 +1,9 @@
+language: csharp
+solution: ./ManagedHook.sln
+node_js:
+  - "7"
+mono: latest
+dotnet: 2.1.301
+install:
+script:
+  - msbuild /p:Configuration=Release ./ManagedHook.sln
