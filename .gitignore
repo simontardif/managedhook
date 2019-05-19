@@ -1,3 +1,7 @@
 packages/
 ManagedHook/obj/
 ManagedHook/bin/
+ManagedHook.Tests/obj/
+ManagedHook.Tests/bin/
+MigrationBackup/
+.vs/
