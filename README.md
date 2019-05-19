@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/simontardif/managedhook.svg?branch=master)](https://travis-ci.com/simontardif/managedhook)
 # ManagedHook
 Managed Hook allows you to hook any methods with a handler that is called before and after the method hooked is called.
 
