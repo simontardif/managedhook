@@ -53,8 +53,8 @@ HookManager.Instance.HookFunction(methodHooked, new MyHookHandler());
    - mov rbx, functionPointer (keep a copy of the original function pointer in register RBX)
    - jmp dynamicMethod (do a relative jump to the dynamic method)
    
-That's it!
-When the original method is called, it will automatically be forwarded to the created dynamic method.
-Inside the generated method, it calls the handler that the client created.
-The HookManager keep all the hooks with the function pointer as the key. 
-(that's why we used the rbx register to know in which original function it was called)
+That's it! <br>
+When the original method is called, it will automatically be forwarded to the created dynamic method. <br>
+Inside the generated method, it calls the handler that the client created. <br>
+The HookManager keep all the hooks with the function pointer as the key. <br>
+(that's why we used the rbx register to know in which original function it was called) <br>
