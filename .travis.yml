@@ -7,4 +7,4 @@ dotnet: 2.1.301
 install:
   - nuget restore ./ManagedHook.sln
 script:
-  - msbuild /p:Configuration=Release ./ManagedHook.sln
+  - msbuild /p:Configuration=Release ./ManagedHook/ManagedHook.csproj
