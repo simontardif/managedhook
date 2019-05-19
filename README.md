@@ -57,4 +57,4 @@ That's it! <br>
 When the original method is called, it will automatically be forwarded to the created dynamic method. <br>
 Inside the generated method, it calls the handler that the client created. <br>
 The HookManager keep all the hooks with the function pointer as the key. <br>
-(that's why we used the rbx register to know in which original function it was called) <br>
+(that's why we used the RBX register to know in which original function it was called) <br>
