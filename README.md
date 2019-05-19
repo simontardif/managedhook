@@ -45,7 +45,7 @@ HookManager.Instance.UnHookFunction(methodHooked);
 ```cs
 HookManager.Instance.HookFunction(methodHooked, new MyHookHandler());
 ```
-1. It gets the address of the original provided function <br>
+1. It gets the address of the original provided function. <br>
 2. It creates a dynamic assembly with two methods (one for instance and one for static method) <br>
    that will be used to be called instead of the original function. <br>
    The dynamic methods must have the exact same signature as the orignal. <br>
