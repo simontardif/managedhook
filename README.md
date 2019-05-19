@@ -51,7 +51,7 @@ HookManager.Instance.HookFunction(methodHooked, new MyHookHandler());
    The dynamic methods must have the exact same signature as the orignal. <br>
 3. It will update the assembly code of the original function to point to one of the generated dynamic methods (the first 16 bytes) <br>
    - mov rbx, functionPointer (keep a copy of the original function pointer in register RBX)
-   - jmp dynamicMethod (do a relative jump to the relative method)
+   - jmp dynamicMethod (do a relative jump to the dynamic method)
    
 That's it!
 When the original method is called, it will automatically be forwarded to the created dynamic method.
