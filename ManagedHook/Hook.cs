@@ -124,10 +124,10 @@ namespace ManagedHook
                 if (value != null && _hookHandler != value)
                 {
                     var beforeMethod = typeof(IHookHandler).GetMethod("Before");
-                    var before = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), value, beforeMethod);
+                    var before = (Action<object, object[]>)Delegate.CreateDelegate(typeof(Action<object, object[]>), value, beforeMethod);
 
                     var afterMethod = typeof(IHookHandler).GetMethod("After");
-                    var after = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), value, afterMethod);
+                    var after = (Action<object, object[]>)Delegate.CreateDelegate(typeof(Action<object, object[]>), value, afterMethod);
 
                     RuntimeHelpers.PrepareMethod(before.Method.MethodHandle);
                     RuntimeHelpers.PrepareMethod(after.Method.MethodHandle);
@@ -148,7 +148,7 @@ namespace ManagedHook
                 if (value != null && _functionReplacer != value)
                 {
                     var newFunctionMethod = typeof(IFunctionReplacer).GetMethod("NewFunction");
-                    var newFunction = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), value, newFunctionMethod);
+                    var newFunction = (Action<object, object[]>)Delegate.CreateDelegate(typeof(Action<object, object[]>), value, newFunctionMethod);
                    
                     RuntimeHelpers.PrepareMethod(newFunction.Method.MethodHandle);
 
@@ -176,18 +176,18 @@ namespace ManagedHook
                     var hook = HookManager.Instance.GetHook((IntPtr)Hook.GetRBX());
                     if (hook.FunctionReplacer != null)
                     {
-                         hook.FunctionReplacer.NewFunction(this);
+                         hook.FunctionReplacer.NewFunction(this, new object[] {replace_me_with_parameters});
                          return replace_me_with_default_return_type;
                     }
 
-                    hook.HookHandler.Before(this); // The ""this"" here is the caller instance, this is not the current class ""MyProgram""
+                    hook.HookHandler.Before(this, new object[] {replace_me_with_parameters}); // The ""this"" here is the caller instance, this is not the current class ""MyProgram""
                     
                     HookManager.Instance.UnHookFunction(hook);
                     var ret = (replace_me_with_return_type)hook.Function.Invoke(this, new object[] {replace_me_with_parameters});
 
                     HookManager.Instance.HookFunction(hook.Function, hook.HookHandler);
 
-                    hook.HookHandler.After(this);
+                    hook.HookHandler.After(this, new object[] {replace_me_with_parameters});
 
                     return ret;
                 }
@@ -196,14 +196,20 @@ namespace ManagedHook
                 private static replace_me_with_return_type MyStaticHook(replace_me_with_parameters_types)
                 {
                     var hook = HookManager.Instance.GetHook((IntPtr)Hook.GetRBX());
-                    hook.HookHandler.Before(null); // the instance is null for static methods
+                    if (hook.FunctionReplacer != null)
+                    {
+                         hook.FunctionReplacer.NewFunction(null, new object[] {replace_me_with_parameters});
+                         return replace_me_with_default_return_type;
+                    }
+
+                    hook.HookHandler.Before(null, new object[] {replace_me_with_parameters}); // the instance is null for static methods
                     
                     HookManager.Instance.UnHookFunction(hook);
                     var ret = (replace_me_with_return_type)hook.Function.Invoke(null, new object[] {replace_me_with_parameters});
 
                     HookManager.Instance.HookFunction(hook.Function, hook.HookHandler);
 
-                    hook.HookHandler.After(null);
+                    hook.HookHandler.After(null, new object[] {replace_me_with_parameters});
 
                     return ret;
                 }

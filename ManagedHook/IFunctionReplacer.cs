@@ -10,6 +10,7 @@ namespace ManagedHook
         /// This method is called instead of the hooked method
         /// </summary>
         /// <param name="instanceHooked">The instance hooked, null if the hooked method is static</param>
-        void NewFunction(object instanceHooked);
+        /// <param name="parameters">The hooked method parameters</param>
+        void NewFunction(object instanceHooked, object[] parameters);
     }
 }

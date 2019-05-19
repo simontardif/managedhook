@@ -512,7 +512,7 @@ namespace ManagedHook.Tests
                 get { return _callsCount; }
             }
 
-            public void NewFunction(object instanceHooked)
+            public void NewFunction(object instanceHooked, object[] parameters)
             {
                 _callsCount++;
                 Trace.WriteLine("New Function Called!");
@@ -539,13 +539,13 @@ namespace ManagedHook.Tests
                 get { return _afterCallsCount; }
             }
 
-            public void Before(object instanceHooked)
+            public void Before(object instanceHooked, object[] parameters)
             {
                 _beforeCallsCount++;
                 Trace.WriteLine("Before Method Called!");
             }
 
-            public void After(object instanceHooked)
+            public void After(object instanceHooked, object[] parameters)
             {
                 _afterCallsCount++;
                 Trace.WriteLine("After Method Called!");
@@ -571,13 +571,13 @@ namespace ManagedHook.Tests
                 get { return _afterCallsCount; }
             }
 
-            public void Before(object instanceHooked)
+            public void Before(object instanceHooked, object[] parameters)
             {
                 _beforeCallsCount++;
                 Trace.WriteLine("Before Method Called!");
             }
 
-            public void After(object instanceHooked)
+            public void After(object instanceHooked, object[] parameters)
             {
                 _afterCallsCount++;
                 Trace.WriteLine("After Method Called!");
