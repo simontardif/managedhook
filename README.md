@@ -3,7 +3,7 @@
 # ManagedHook
 Managed Hook allows you to hook any methods with a handler that is called before and after the hooked method is called. <br>
 Tested with X64 architecture with non-inlined methods. <br>
-(careful with optimized code with inlined methods, the pattern was not intended to use in that case) <br>
+(careful with optimized code with inlined methods, the pattern was not intended to be used in that case) <br>
 
 How to use:
 
