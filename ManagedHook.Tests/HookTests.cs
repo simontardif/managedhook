@@ -17,14 +17,14 @@ namespace ManagedHook.Tests
     {
         static void Main(string[] args)
         {
+            HookStaticMethod_CallOriginalMethod_StaticMethodHooked();
+
             ReplaceFunction_InternalType_NewFunctionCalled();
             HookInstanceMethod_CallOriginalMethod_InstanceMethodHooked();
             HookInstanceMethod_HookTwice_InstanceMethodHooked();
             HookInstanceMethod02_HookTwice_InstanceMethodHooked();
             HookInstanceMethod03_CallOriginalMethod_InstanceMethodHooked();
             HookEventHandler_CallEventHandlerSubscription_EventHandlerHooked();
-
-            HookStaticMethod_CallOriginalMethod_StaticMethodHooked();
 
             HookInternalInstanceMethod_CallOriginalInternalMethod_InstanceMethodHooked();
             HookPrivateInstanceMethod_CallOriginalPrivateMethod_InstanceMethodHooked();
@@ -442,7 +442,7 @@ namespace ManagedHook.Tests
                 return 12 + k + m;
             }
 
-            [MethodImpl(MethodImplOptions.NoInlining)]
+            //[MethodImpl(MethodImplOptions.NoInlining)]
             public int OriginalInstanceMethod(int test, int k, int m, ClassParameter c)
             {
                 object t = test;

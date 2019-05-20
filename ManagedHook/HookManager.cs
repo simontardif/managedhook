@@ -162,8 +162,8 @@ namespace ManagedHook
         /// <summary>
         /// Return true if the function can be inlined (return false even if the function is in an optimized library)
         /// Non-Optimized library --> false
+        /// No Inlining Attribute, Virtual --> false
         /// 32 bytes IL Code --> true (only condition that can make this function returns true)
-        /// No Inlining Attribute --> false
         /// </summary>
         /// <param name="function">The function to be validated.</param>
         /// <returns>If the function can be inlined</returns>
@@ -175,15 +175,16 @@ namespace ManagedHook
                 return false;
             }
 
+            if (function.MethodImplementationFlags == MethodImplAttributes.NoInlining ||
+               function.IsVirtual)
+            {
+                return false;
+            }
+
             int ilSize = function.GetMethodBody().GetILAsByteArray().Length;
             if (ilSize <= 32)
             {
                 return true;
-            }
-
-            if (function.MethodImplementationFlags == MethodImplAttributes.NoInlining)
-            {
-                return false;
             }
 
             return false;
