@@ -48,7 +48,7 @@ HookManager.Instance.HookFunction(methodHooked, new MyHookHandler());
 1. It gets the address of the original provided function. <br>
 2. It creates a dynamic assembly with two methods (one for instance and one for static method) <br>
    that will be used to be called instead of the original function. <br>
-   The dynamic methods must have the exact same signature as the orignal. <br>
+   The dynamic methods are created with the exact same signature as the orignal. <br>
 3. It will update the assembly code of the original function to point to one of the generated dynamic methods (the first 16 bytes) <br>
    - mov rbx, functionPointer (keep a copy of the original function pointer in register RBX)
    - jmp dynamicMethod (do a relative jump to the dynamic method)
