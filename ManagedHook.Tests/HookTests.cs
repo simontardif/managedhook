@@ -54,6 +54,7 @@ namespace ManagedHook.Tests
 
             HookManager.Instance.ReplaceFunction(addMethod, functionReplacer);
 
+
             addMethod.Invoke(automationEvents, new[] { new object() });
 
             Assert.AreEqual(1, functionReplacer.CallsCount);
@@ -441,7 +442,7 @@ namespace ManagedHook.Tests
                 return 12 + k + m;
             }
 
-            //[MethodImpl(MethodImplOptions.NoInlining)]
+            [MethodImpl(MethodImplOptions.NoInlining)]
             public int OriginalInstanceMethod(int test, int k, int m, ClassParameter c)
             {
                 object t = test;

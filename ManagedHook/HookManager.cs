@@ -145,18 +145,48 @@ namespace ManagedHook
 
             if (IntPtr.Size == 4)
             {
-                throw new ArgumentNullException("Cannot hook in 32 bit assembly!");
+                throw new ArgumentException("Cannot hook in 32 bit assembly!");
             }
 
-            if (IsJitOptimizerEnabled(function.Module.Assembly))
+            if (CanBeInlined(function))
             {
-                throw new ArgumentException("Cannot hook a function that is in a optimized assembly!");
+                throw new ArgumentException("Cannot hook a function that can be possibly be inlined!");
             }
 
             if (_hooks.ContainsKey(function.MethodHandle.GetFunctionPointer()))
             {
                 throw new ArgumentException("Cannot hook a function twice.", nameof(function));
             }
+        }
+
+        /// <summary>
+        /// Return true if the function can be inlined (return false even if the function is in an optimized library)
+        /// Non-Optimized library --> false
+        /// 32 bytes IL Code --> true (only condition that can make this function returns true)
+        /// No Inlining Attribute --> false
+        /// </summary>
+        /// <param name="function">The function to be validated.</param>
+        /// <returns>If the function can be inlined</returns>
+        private static bool CanBeInlined(MethodBase function)
+        {
+            bool isJitOptimizer = IsJitOptimizerEnabled(function.Module.Assembly);
+            if (!isJitOptimizer)
+            {
+                return false;
+            }
+
+            int ilSize = function.GetMethodBody().GetILAsByteArray().Length;
+            if (ilSize <= 32)
+            {
+                return true;
+            }
+
+            if (function.MethodImplementationFlags == MethodImplAttributes.NoInlining)
+            {
+                return false;
+            }
+
+            return false;
         }
 
         private static bool IsJitOptimizerEnabled(Assembly assembly)
