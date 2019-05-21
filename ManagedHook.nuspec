@@ -9,7 +9,7 @@
 	<projectUrl>https://github.com/simontardif/managedhook</projectUrl>
 	<license type="file">license.txt</license>
     <description>Managed Hook allows you to hook any methods with a handler that is called when the hooked method is called.</description>
-    <releaseNotes>Change the condition if a method can be inlined.</releaseNotes>
+    <releaseNotes>Hook functions with lambda expression.</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>Hook, Detour</tags>
     <dependencies>
