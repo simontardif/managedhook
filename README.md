@@ -33,6 +33,10 @@ MethodInfo methodHooked = typeof(Foo).GetMethod("MethodHooked");
 ```cs
 HookManager.Instance.HookFunction(methodHooked, new MyHookHandler());
 ```
+Or hook the method with lamdas (before call and after call)
+```cs
+HookManager.Instance.HookFunction(methodHooked, (t) => { ... }, (t) => { ... });
+```
 
 4 - (opt) When finished, you can unhook the method:
 ```cs
