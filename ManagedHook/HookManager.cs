@@ -46,11 +46,45 @@ namespace ManagedHook
         }
 
         /// <summary>
-        /// Replace a function by a hook handler to be called before and after the function hooked.
+        /// Replace a function by a hook handler to be called instead of the hooked function.
         /// Please hook only once a function, otherwise the method returns an argument exception.
         /// </summary>
-        /// <param name="function">The function to be hooked.</param>
-        /// <param name="hookHandler">The hook handler that is called before and after the function hooked.</param>
+        /// <param name="function">The function to be replaced.</param>
+        /// <param name="functionReplacer">The function replacer that is called instead of the hooked method.</param>
+        public Hook ReplaceFunction(MethodBase function, Action<object> functionReplacer)
+        {
+            if (functionReplacer == null)
+            {
+                throw new ArgumentNullException(nameof(functionReplacer));
+            }
+
+            var functionReplacerInstance = new FunctionReplacerNoParameters(functionReplacer);
+            return ReplaceFunction(function, functionReplacerInstance);
+        }
+
+        /// <summary>
+        /// Replace a function by a hook handler to be called instead of the hooked function.
+        /// Please hook only once a function, otherwise the method returns an argument exception.
+        /// </summary>
+        /// <param name="function">The function to be replaced.</param>
+        /// <param name="functionReplacer">The function replacer with parameters that is called instead of the hooked method.</param>
+        public Hook ReplaceFunction(MethodBase function, Action<object, object[]> functionReplacer)
+        {
+            if (functionReplacer == null)
+            {
+                throw new ArgumentNullException(nameof(functionReplacer));
+            }
+
+            var functionReplacerInstance = new FunctionReplacerWithParameters(functionReplacer);
+            return ReplaceFunction(function, functionReplacerInstance);
+        }
+
+        /// <summary>
+        /// Replace a function by a hook handler to be called instead of the hooked function.
+        /// Please hook only once a function, otherwise the method returns an argument exception.
+        /// </summary>
+        /// <param name="function">The function to be replaced.</param>
+        /// <param name="functionReplacer">The function replacer that is called instead of the hooked method.</param>
         public Hook ReplaceFunction(MethodBase function, IFunctionReplacer functionReplacer)
         {
             if (functionReplacer == null)
@@ -68,6 +102,7 @@ namespace ManagedHook
             }
             else
             {
+                hook.HookHandler = null;
                 hook.FunctionReplacer = functionReplacer;
                 hook.UpdateOriginalFunction();
             }
@@ -75,6 +110,32 @@ namespace ManagedHook
             _hooks.Add(hook.MethodPointer, hook); // Add the hook to the effective list of used hooks
 
             return hook;
+        }
+
+        /// <summary>
+        /// Hook a function by a hook handler to be called before and after the function hooked.
+        /// Please hook only once a function, otherwise the method returns an argument exception.
+        /// </summary>
+        /// <param name="function">The function to be hooked.</param>
+        /// <param name="beforeCall">The action that is called just before the hooked method is called.</param>
+        /// <param name="afterCall">The action that is called just after the hooked method is called.</param>
+        public Hook HookFunction(MethodBase function, Action<object> beforeCall, Action<object> afterCall)
+        {
+            var hookHandlerInstance = new HookHandlerNoParameters(beforeCall, afterCall);
+            return HookFunction(function, hookHandlerInstance);
+        }
+
+        /// <summary>
+        /// Hook a function by a hook handler to be called before and after the function hooked.
+        /// Please hook only once a function, otherwise the method returns an argument exception.
+        /// </summary>
+        /// <param name="function">The function to be hooked.</param>
+        /// <param name="beforeCall">The action that is called just before the hooked method is called.</param>
+        /// <param name="afterCall">The action that is called just after the hooked method is called.</param>
+        public Hook HookFunction(MethodBase function, Action<object, object[]> beforeCall, Action<object, object[]> afterCall)
+        {
+            var hookHandlerInstance = new HookHandlerWithParameters(beforeCall, afterCall);
+            return HookFunction(function, hookHandlerInstance);
         }
 
         /// <summary>
@@ -96,6 +157,7 @@ namespace ManagedHook
             else
             {
                 hook.HookHandler = hookHandler;
+                hook.FunctionReplacer = null;
                 hook.UpdateOriginalFunction();
             }
 
@@ -209,6 +271,76 @@ namespace ManagedHook
             }
 
             return false;
+        }
+
+        private class HookHandlerNoParameters : IHookHandler
+        {
+            private readonly Action<object> _beforeCall;
+            private readonly Action<object> _afterCall;
+            public HookHandlerNoParameters(Action<object> beforeCall, Action<object> afterCall)
+            {
+                _beforeCall = beforeCall;
+                _afterCall = afterCall;
+            }
+
+            public void Before(object instanceHooked, object[] parameters)
+            {
+                _beforeCall?.Invoke(instanceHooked);
+            }
+
+            public void After(object instanceHooked, object[] parameters)
+            {
+                _afterCall?.Invoke(instanceHooked);
+            }
+        }
+
+        private class HookHandlerWithParameters : IHookHandler
+        {
+            private readonly Action<object, object[]> _beforeCall;
+            private readonly Action<object, object[]> _afterCall;
+            public HookHandlerWithParameters(Action<object, object[]> beforeCall, Action<object, object[]> afterCall)
+            {
+                _beforeCall = beforeCall;
+                _afterCall = afterCall;
+            }
+
+            public void Before(object instanceHooked, object[] parameters)
+            {
+                _beforeCall?.Invoke(instanceHooked, parameters);
+            }
+
+            public void After(object instanceHooked, object[] parameters)
+            {
+                _afterCall?.Invoke(instanceHooked, parameters);
+            }
+        }
+
+        private class FunctionReplacerNoParameters : IFunctionReplacer
+        {
+            private readonly Action<object> _functionReplacer;
+            public FunctionReplacerNoParameters(Action<object> functionReplacer)
+            {
+                _functionReplacer = functionReplacer;
+            }
+
+            public void NewFunction(object instanceHooked, object[] parameters)
+            {
+                _functionReplacer.Invoke(instanceHooked);
+            }
+        }
+
+        private class FunctionReplacerWithParameters : IFunctionReplacer
+        {
+            private readonly Action<object, object[]> _functionReplacer;
+            public FunctionReplacerWithParameters(Action<object, object[]> functionReplacer)
+            {
+                _functionReplacer = functionReplacer;
+            }
+
+            public void NewFunction(object instanceHooked, object[] parameters)
+            {
+                _functionReplacer.Invoke(instanceHooked, parameters);
+            }
         }
 
         #endregion

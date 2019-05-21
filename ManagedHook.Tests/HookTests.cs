@@ -21,6 +21,12 @@ namespace ManagedHook.Tests
             HookStaticMethod_CallOriginalMethod_StaticMethodHooked();
 
             ReplaceFunction_InternalType_NewFunctionCalled();
+            ReplaceFunction_LamdaExpression_LambdaCalled();
+            ReplaceFunction_LamdaExpressionWithParameters_LambdaCalled();
+
+            HookFunction_LamdaExpressionNoParameters_LambdaCalled();
+            HookFunction_LamdaExpressionWithParameters_LambdaCalled();
+
             HookInstanceMethod_CallOriginalMethod_InstanceMethodHooked();
             HookInstanceMethod_HookTwice_InstanceMethodHooked();
             HookInstanceMethod02_HookTwice_InstanceMethodHooked();
@@ -35,6 +41,8 @@ namespace ManagedHook.Tests
             Console.WriteLine("Unit Test Successful!");
             Console.ReadKey();
         }
+
+        #region Tests
 
         private static void CanBeHooked_NoCondition_ReturnTrue()
         {
@@ -54,6 +62,124 @@ namespace ManagedHook.Tests
             Assert.IsTrue(HookManager.Instance.CanBeHooked(instanceMethod), "We should be able to hook this method");
         }
 
+        private static void HookFunction_LamdaExpressionNoParameters_LambdaCalled()
+        {
+            Assembly framework = Assembly.GetAssembly(typeof(ContentElement));
+            Type clmt = framework.GetType("System.Windows.ContextLayoutManager");
+            MethodInfo mi = clmt.GetMethod("From", BindingFlags.Static | BindingFlags.NonPublic);
+            object clm = mi.Invoke(null, new object[] { Dispatcher.CurrentDispatcher });
+            PropertyInfo aepi = clm.GetType().GetProperty("AutomationEvents", BindingFlags.Instance | BindingFlags.NonPublic);
+            object automationEvents = aepi.GetValue(clm, null);
+            FieldInfo cfi = automationEvents.GetType().GetField("_count", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo hfi = automationEvents.GetType().GetField("_head", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo rimi = automationEvents.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var addMethod = automationEvents.GetType().GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic);
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            int callCount = 0;
+            var hook = HookManager.Instance.HookFunction(addMethod, (t) =>
+            {
+                callCount++;
+            }, null);
+
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            Assert.AreEqual(1, callCount);
+
+            HookManager.Instance.UnHookFunction(hook);
+        }
+
+        private static void HookFunction_LamdaExpressionWithParameters_LambdaCalled()
+        {
+            Assembly framework = Assembly.GetAssembly(typeof(ContentElement));
+            Type clmt = framework.GetType("System.Windows.ContextLayoutManager");
+            MethodInfo mi = clmt.GetMethod("From", BindingFlags.Static | BindingFlags.NonPublic);
+            object clm = mi.Invoke(null, new object[] { Dispatcher.CurrentDispatcher });
+            PropertyInfo aepi = clm.GetType().GetProperty("AutomationEvents", BindingFlags.Instance | BindingFlags.NonPublic);
+            object automationEvents = aepi.GetValue(clm, null);
+            FieldInfo cfi = automationEvents.GetType().GetField("_count", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo hfi = automationEvents.GetType().GetField("_head", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo rimi = automationEvents.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var addMethod = automationEvents.GetType().GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic);
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            int callCount = 0;
+            int parametersLength = 0;
+            var hook = HookManager.Instance.HookFunction(addMethod, (t, w) =>
+            {
+                callCount++;
+                parametersLength = w.Length;
+            }, null);
+
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            Assert.AreEqual(1, callCount);
+            Assert.AreEqual(1, parametersLength);
+
+            HookManager.Instance.UnHookFunction(hook);
+        }
+
+        private static void ReplaceFunction_LamdaExpressionWithParameters_LambdaCalled()
+        {
+            Assembly framework = Assembly.GetAssembly(typeof(ContentElement));
+            Type clmt = framework.GetType("System.Windows.ContextLayoutManager");
+            MethodInfo mi = clmt.GetMethod("From", BindingFlags.Static | BindingFlags.NonPublic);
+            object clm = mi.Invoke(null, new object[] { Dispatcher.CurrentDispatcher });
+            PropertyInfo aepi = clm.GetType().GetProperty("AutomationEvents", BindingFlags.Instance | BindingFlags.NonPublic);
+            object automationEvents = aepi.GetValue(clm, null);
+            FieldInfo cfi = automationEvents.GetType().GetField("_count", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo hfi = automationEvents.GetType().GetField("_head", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo rimi = automationEvents.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var addMethod = automationEvents.GetType().GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic);
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            int callCount = 0;
+            int parametersLength = 0;
+            var hook = HookManager.Instance.ReplaceFunction(addMethod, (t, w) =>
+            {
+                parametersLength = w.Length;
+                callCount++;
+            });
+
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            Assert.AreEqual(1, callCount);
+            Assert.AreEqual(1, parametersLength);
+
+            HookManager.Instance.UnHookFunction(hook);
+        }
+
+        private static void ReplaceFunction_LamdaExpression_LambdaCalled()
+        {
+            Assembly framework = Assembly.GetAssembly(typeof(ContentElement));
+            Type clmt = framework.GetType("System.Windows.ContextLayoutManager");
+            MethodInfo mi = clmt.GetMethod("From", BindingFlags.Static | BindingFlags.NonPublic);
+            object clm = mi.Invoke(null, new object[] { Dispatcher.CurrentDispatcher });
+            PropertyInfo aepi = clm.GetType().GetProperty("AutomationEvents", BindingFlags.Instance | BindingFlags.NonPublic);
+            object automationEvents = aepi.GetValue(clm, null);
+            FieldInfo cfi = automationEvents.GetType().GetField("_count", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo hfi = automationEvents.GetType().GetField("_head", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo rimi = automationEvents.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var addMethod = automationEvents.GetType().GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic);
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            int callCount = 0;
+            var hook = HookManager.Instance.ReplaceFunction(addMethod, (t) =>
+            {
+                callCount++;
+            });
+
+            addMethod.Invoke(automationEvents, new[] { new object() });
+
+            Assert.AreEqual(1, callCount);
+
+            HookManager.Instance.UnHookFunction(hook);
+        }
+
         private static void ReplaceFunction_InternalType_NewFunctionCalled()
         {
             Assembly framework = Assembly.GetAssembly(typeof(ContentElement));
@@ -71,14 +197,14 @@ namespace ManagedHook.Tests
 
             var functionReplacer = new FunctionReplacer();
 
-            HookManager.Instance.ReplaceFunction(addMethod, functionReplacer);
+            var hook = HookManager.Instance.ReplaceFunction(addMethod, functionReplacer);
 
             addMethod.Invoke(automationEvents, new[] { new object() });
 
             Assert.AreEqual(1, functionReplacer.CallsCount);
-        }
 
-        #region Tests
+            HookManager.Instance.UnHookFunction(hook);
+        }
 
         private static void HookEventHandler_CallEventHandlerSubscription_EventHandlerHooked()
         {

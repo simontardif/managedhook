@@ -134,6 +134,10 @@ namespace ManagedHook
 
                     _hookHandler = value;
                 }
+                else if (value == null)
+                {
+                    _hookHandler = value;
+                }
             }
         }
 
@@ -152,6 +156,10 @@ namespace ManagedHook
                    
                     RuntimeHelpers.PrepareMethod(newFunction.Method.MethodHandle);
 
+                    _functionReplacer = value;
+                }
+                else if (value == null)
+                {
                     _functionReplacer = value;
                 }
             }
