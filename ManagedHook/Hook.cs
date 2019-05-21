@@ -152,7 +152,7 @@ namespace ManagedHook
                 if (value != null && _functionReplacer != value)
                 {
                     var newFunctionMethod = typeof(IFunctionReplacer).GetMethod("NewFunction");
-                    var newFunction = (Action<object, object[]>)Delegate.CreateDelegate(typeof(Action<object, object[]>), value, newFunctionMethod);
+                    var newFunction = (Func<object, object[], object>)Delegate.CreateDelegate(typeof(Func<object, object[], object>), value, newFunctionMethod);
                    
                     RuntimeHelpers.PrepareMethod(newFunction.Method.MethodHandle);
 
@@ -184,8 +184,8 @@ namespace ManagedHook
                     var hook = HookManager.Instance.GetHook((IntPtr)Hook.GetRBX());
                     if (hook.FunctionReplacer != null)
                     {
-                         hook.FunctionReplacer.NewFunction(this, new object[] {replace_me_with_parameters});
-                         return replace_me_with_default_return_type;
+                         var obj = (replace_me_with_cast_return_type)hook.FunctionReplacer.NewFunction(this, new object[] {replace_me_with_parameters});
+                         return replace_me_with_new_function_return_type;
                     }
 
                     hook.HookHandler.Before(this, new object[] {replace_me_with_parameters}); // The ""this"" here is the caller instance, this is not the current class ""MyProgram""
@@ -206,8 +206,8 @@ namespace ManagedHook
                     var hook = HookManager.Instance.GetHook((IntPtr)Hook.GetRBX());
                     if (hook.FunctionReplacer != null)
                     {
-                         hook.FunctionReplacer.NewFunction(null, new object[] {replace_me_with_parameters});
-                         return replace_me_with_default_return_type;
+                         var obj = (replace_me_with_cast_return_type)hook.FunctionReplacer.NewFunction(null, new object[] {replace_me_with_parameters});
+                         return replace_me_with_new_function_return_type;
                     }
 
                     hook.HookHandler.Before(null, new object[] {replace_me_with_parameters}); // the instance is null for static methods
@@ -243,8 +243,8 @@ namespace ManagedHook
             }
 
             parameters.GenerateInMemory = true;
-            parameters.IncludeDebugInformation = true; //.pdb
-            parameters.GenerateExecutable = false; //dll
+            parameters.IncludeDebugInformation = true; // .pdb
+            parameters.GenerateExecutable = false; // dll
 
             CompilerResults results = provider.CompileAssemblyFromSource(parameters, hookCode);
 
@@ -257,14 +257,8 @@ namespace ManagedHook
             Type program = assembly.GetType(programName);
 
             MethodInfo myHook;
-            if (isInstance)
-            {
-                myHook = program.GetMethod("MyInstanceHook", BindingFlags.Instance | BindingFlags.NonPublic);
-            }
-            else
-            {
-                myHook = program.GetMethod("MyStaticHook", BindingFlags.Static | BindingFlags.NonPublic);
-            }
+            myHook = isInstance ? program.GetMethod("MyInstanceHook", BindingFlags.Instance | BindingFlags.NonPublic) :
+                                  program.GetMethod("MyStaticHook", BindingFlags.Static | BindingFlags.NonPublic);
 
             return myHook;
         }
@@ -341,13 +335,15 @@ namespace ManagedHook
             if (returnType == "System.Void" || _isConstructor)
             {
                 code = code.Replace("var ret = (replace_me_with_return_type)", "");
-                code = code.Replace("replace_me_with_default_return_type", "");
+                code = code.Replace("replace_me_with_new_function_return_type", "");
                 code = code.Replace("return ret;", "");
+                code = code.Replace("replace_me_with_cast_return_type", "object");
                 returnType = "void";
             }
 
             code = code.Replace("replace_me_with_return_type", returnType);
-            code = code.Replace("replace_me_with_default_return_type", $"default({returnType})");
+            code = code.Replace("replace_me_with_cast_return_type", returnType);
+            code = code.Replace("replace_me_with_new_function_return_type", $"obj");
 
             return code;
         }

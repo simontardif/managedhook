@@ -11,6 +11,7 @@ namespace ManagedHook
         /// </summary>
         /// <param name="instanceHooked">The instance hooked, null if the hooked method is static</param>
         /// <param name="parameters">The hooked method parameters</param>
-        void NewFunction(object instanceHooked, object[] parameters);
+        /// <returns>The new function returned value</returns>
+        object NewFunction(object instanceHooked, object[] parameters);
     }
 }

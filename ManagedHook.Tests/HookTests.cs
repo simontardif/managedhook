@@ -33,6 +33,9 @@ namespace ManagedHook.Tests
             HookInstanceMethod03_CallOriginalMethod_InstanceMethodHooked();
             HookEventHandler_CallEventHandlerSubscription_EventHandlerHooked();
 
+            ReplaceInstanceMethod_CallOriginalMethod_NewFunctionCalled();
+            ReplaceInstanceMethod_WithLambdaExpression_NewFunctionCalled();
+
             HookInternalInstanceMethod_CallOriginalInternalMethod_InstanceMethodHooked();
             HookPrivateInstanceMethod_CallOriginalPrivateMethod_InstanceMethodHooked();
 
@@ -142,6 +145,7 @@ namespace ManagedHook.Tests
             {
                 parametersLength = w.Length;
                 callCount++;
+                return null;
             });
 
             addMethod.Invoke(automationEvents, new[] { new object() });
@@ -171,6 +175,7 @@ namespace ManagedHook.Tests
             var hook = HookManager.Instance.ReplaceFunction(addMethod, (t) =>
             {
                 callCount++;
+                return null;
             });
 
             addMethod.Invoke(automationEvents, new[] { new object() });
@@ -305,6 +310,55 @@ namespace ManagedHook.Tests
         private static void O_MyEvent(object sender, EventArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        private static void ReplaceInstanceMethod_CallOriginalMethod_NewFunctionCalled()
+        {
+            var functionReplacer = new FunctionReplacer();
+            var classParameter = new ClassParameter();
+            classParameter.Method();
+
+            var hookClass = new HookClass("First Hook"); // the instance
+            var instanceMethod = hookClass.GetType().GetMethod("OriginalInstanceMethod");
+            int ret = hookClass.OriginalInstanceMethod(3, 5, 7, classParameter);
+
+            var hook = HookManager.Instance.ReplaceFunction(instanceMethod, functionReplacer);
+
+            ret = hookClass.OriginalInstanceMethod(3, 5, 7, classParameter); // The new function should be called
+
+            Assert.AreEqual(1, ret);
+            Assert.AreEqual(1, functionReplacer.CallsCount, "The new function should be called once");
+
+            HookManager.Instance.UnHookFunction(hook);
+
+            ret = hookClass.OriginalInstanceMethod(3, 5, 7, classParameter); // The original method is called
+
+            Assert.AreEqual(15, ret);
+            Assert.AreEqual(1, functionReplacer.CallsCount);
+        }
+
+        private static void ReplaceInstanceMethod_WithLambdaExpression_NewFunctionCalled()
+        {
+            var classParameter = new ClassParameter();
+            classParameter.Method();
+
+            var hookClass = new HookClass("First Hook"); // the instance
+            var instanceMethod = hookClass.GetType().GetMethod("OriginalInstanceMethod");
+            int ret = hookClass.OriginalInstanceMethod(3, 5, 7, classParameter);
+            int callsCount = 0;
+            var hook = HookManager.Instance.ReplaceFunction(instanceMethod, (t) => { callsCount++; return 3; });
+
+            ret = hookClass.OriginalInstanceMethod(3, 5, 7, classParameter); // The new function should be called
+
+            Assert.AreEqual(3, ret);
+            Assert.AreEqual(1, callsCount, "The new function should be called once");
+
+            HookManager.Instance.UnHookFunction(hook);
+
+            ret = hookClass.OriginalInstanceMethod(3, 5, 7, classParameter); // The original method is called
+
+            Assert.AreEqual(15, ret);
+            Assert.AreEqual(1, callsCount);
         }
 
         private static void HookInstanceMethod_CallOriginalMethod_InstanceMethodHooked()
@@ -663,10 +717,11 @@ namespace ManagedHook.Tests
                 get { return _callsCount; }
             }
 
-            public void NewFunction(object instanceHooked, object[] parameters)
+            public object NewFunction(object instanceHooked, object[] parameters)
             {
                 _callsCount++;
                 Trace.WriteLine("New Function Called!");
+                return _callsCount;
             }
         }
 

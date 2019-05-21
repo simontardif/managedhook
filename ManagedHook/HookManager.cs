@@ -58,7 +58,7 @@ namespace ManagedHook
                 throw new ArgumentNullException(nameof(functionReplacer));
             }
 
-            var functionReplacerInstance = new FunctionReplacerNoParameters(functionReplacer);
+            var functionReplacerInstance = new FunctionReplacerNoParametersNoReturn(functionReplacer);
             return ReplaceFunction(function, functionReplacerInstance);
         }
 
@@ -69,6 +69,40 @@ namespace ManagedHook
         /// <param name="function">The function to be replaced.</param>
         /// <param name="functionReplacer">The function replacer with parameters that is called instead of the hooked method.</param>
         public Hook ReplaceFunction(MethodBase function, Action<object, object[]> functionReplacer)
+        {
+            if (functionReplacer == null)
+            {
+                throw new ArgumentNullException(nameof(functionReplacer));
+            }
+
+            var functionReplacerInstance = new FunctionReplacerWithParametersNoReturn(functionReplacer);
+            return ReplaceFunction(function, functionReplacerInstance);
+        }
+
+        /// <summary>
+        /// Replace a function by a hook handler to be called instead of the hooked function.
+        /// Please hook only once a function, otherwise the method returns an argument exception.
+        /// </summary>
+        /// <param name="function">The function to be replaced.</param>
+        /// <param name="functionReplacer">The function replacer that is called instead of the hooked method.</param>
+        public Hook ReplaceFunction(MethodBase function, Func<object, object> functionReplacer)
+        {
+            if (functionReplacer == null)
+            {
+                throw new ArgumentNullException(nameof(functionReplacer));
+            }
+
+            var functionReplacerInstance = new FunctionReplacerNoParameters(functionReplacer);
+            return ReplaceFunction(function, functionReplacerInstance);
+        }
+
+        /// <summary>
+        /// Replace a function by a hook handler to be called instead of the hooked function.
+        /// Please hook only once a function, otherwise the method returns an argument exception.
+        /// </summary>
+        /// <param name="function">The function to be replaced.</param>
+        /// <param name="functionReplacer">The function replacer with parameters that is called instead of the hooked method.</param>
+        public Hook ReplaceFunction(MethodBase function, Func<object, object[], object> functionReplacer)
         {
             if (functionReplacer == null)
             {
@@ -317,29 +351,59 @@ namespace ManagedHook
 
         private class FunctionReplacerNoParameters : IFunctionReplacer
         {
-            private readonly Action<object> _functionReplacer;
-            public FunctionReplacerNoParameters(Action<object> functionReplacer)
+            private readonly Func<object, object> _functionReplacer;
+            public FunctionReplacerNoParameters(Func<object, object> functionReplacer)
             {
                 _functionReplacer = functionReplacer;
             }
 
-            public void NewFunction(object instanceHooked, object[] parameters)
+            public object NewFunction(object instanceHooked, object[] parameters)
             {
-                _functionReplacer.Invoke(instanceHooked);
+                return _functionReplacer.Invoke(instanceHooked);
             }
         }
 
         private class FunctionReplacerWithParameters : IFunctionReplacer
         {
-            private readonly Action<object, object[]> _functionReplacer;
-            public FunctionReplacerWithParameters(Action<object, object[]> functionReplacer)
+            private readonly Func<object, object[], object> _functionReplacer;
+            public FunctionReplacerWithParameters(Func<object, object[], object> functionReplacer)
             {
                 _functionReplacer = functionReplacer;
             }
 
-            public void NewFunction(object instanceHooked, object[] parameters)
+            public object NewFunction(object instanceHooked, object[] parameters)
+            {
+                return _functionReplacer.Invoke(instanceHooked, parameters);
+            }
+        }
+
+        private class FunctionReplacerNoParametersNoReturn : IFunctionReplacer
+        {
+            private readonly Action<object> _functionReplacer;
+            public FunctionReplacerNoParametersNoReturn(Action<object> functionReplacer)
+            {
+                _functionReplacer = functionReplacer;
+            }
+
+            public object NewFunction(object instanceHooked, object[] parameters)
+            {
+                _functionReplacer.Invoke(instanceHooked);
+                return null;
+            }
+        }
+
+        private class FunctionReplacerWithParametersNoReturn : IFunctionReplacer
+        {
+            private readonly Action<object, object[]> _functionReplacer;
+            public FunctionReplacerWithParametersNoReturn(Action<object, object[]> functionReplacer)
+            {
+                _functionReplacer = functionReplacer;
+            }
+
+            public object NewFunction(object instanceHooked, object[] parameters)
             {
                 _functionReplacer.Invoke(instanceHooked, parameters);
+                return null;
             }
         }
 
