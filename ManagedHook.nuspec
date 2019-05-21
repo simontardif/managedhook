@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>ManagedHook</id>
-    <version>1.0.5</version>
+    <version>1.1.0</version>
     <authors>Simon Tardif-Morneau</authors>
     <owners>Simon Tardif-Morneau</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
