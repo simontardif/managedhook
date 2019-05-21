@@ -132,6 +132,14 @@ namespace ManagedHook
             return false;
         }
 
+        public bool CanBeHooked(MethodBase function)
+        {
+            return function != null &&
+                   IntPtr.Size == 8 && // x64 assembly for the moment
+                   !CanBeInlined(function) && // non-inlined methods
+                   !_hooks.ContainsKey(function.MethodHandle.GetFunctionPointer()); // is not already hooked
+        }
+
         #endregion
 
         #region Private Methods

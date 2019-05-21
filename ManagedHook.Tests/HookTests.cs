@@ -17,6 +17,7 @@ namespace ManagedHook.Tests
     {
         static void Main(string[] args)
         {
+            CanBeHooked_NoCondition_ReturnTrue();
             HookStaticMethod_CallOriginalMethod_StaticMethodHooked();
 
             ReplaceFunction_InternalType_NewFunctionCalled();
@@ -33,6 +34,24 @@ namespace ManagedHook.Tests
 
             Console.WriteLine("Unit Test Successful!");
             Console.ReadKey();
+        }
+
+        private static void CanBeHooked_NoCondition_ReturnTrue()
+        {
+            var hookHandler = new HookHandler();
+            var classParameter = new ClassParameter();
+            classParameter.Method();
+            var hookClass = new HookClass("First Hook"); // the instance
+            var instanceMethod = hookClass.GetType().GetMethod("OriginalInstanceMethod");
+            Assert.IsTrue(HookManager.Instance.CanBeHooked(instanceMethod), "We should be able to hook this method");
+
+            var hook = HookManager.Instance.HookFunction(instanceMethod, hookHandler);
+
+            Assert.IsFalse(HookManager.Instance.CanBeHooked(instanceMethod), "We should not be able to hook this method");
+
+            HookManager.Instance.UnHookFunction(hook);
+
+            Assert.IsTrue(HookManager.Instance.CanBeHooked(instanceMethod), "We should be able to hook this method");
         }
 
         private static void ReplaceFunction_InternalType_NewFunctionCalled()
@@ -53,7 +72,6 @@ namespace ManagedHook.Tests
             var functionReplacer = new FunctionReplacer();
 
             HookManager.Instance.ReplaceFunction(addMethod, functionReplacer);
-
 
             addMethod.Invoke(automationEvents, new[] { new object() });
 
@@ -401,7 +419,13 @@ namespace ManagedHook.Tests
 
         #region Data for Unit Tests
 
-       
+        internal class SimpleHookClass
+        {
+            public void Method()
+            {
+                //Trace.WriteLine("Original Instance Method called");
+            }
+        }
 
         internal class HookClass: MarshalByRefObject
         {
