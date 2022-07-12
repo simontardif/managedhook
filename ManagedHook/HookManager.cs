@@ -247,10 +247,11 @@ namespace ManagedHook
                 throw new ArgumentNullException(nameof(function));
             }
 
-            if (IntPtr.Size == 4)
+            //NOW SUPPORTED :D
+            /*if (IntPtr.Size == 4)
             {
                 throw new ArgumentException("Cannot hook in 32 bit assembly!");
-            }
+            }*/
 
             if (CanBeInlined(function))
             {
