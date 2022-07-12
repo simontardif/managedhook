@@ -1,4 +1,4 @@
-My Edit: Now works with x86 architecture aswell.
+[!My Edit: Now works with x86 architecture aswell.
 
 [![Build Status](https://travis-ci.com/simontardif/managedhook.svg?branch=master)](https://travis-ci.com/simontardif/managedhook)
 [![NuGet](https://img.shields.io/nuget/v/ManagedHook.svg)](https://www.nuget.org/packages/ManagedHook)
