@@ -1,8 +1,8 @@
-[!My Edit: Now works with x86 architecture aswell.
+# My Edit: Now works with x86 architecture aswell.
 
 [![Build Status](https://travis-ci.com/simontardif/managedhook.svg?branch=master)](https://travis-ci.com/simontardif/managedhook)
 [![NuGet](https://img.shields.io/nuget/v/ManagedHook.svg)](https://www.nuget.org/packages/ManagedHook)
-# ManagedHook
+# ManagedHook x86 & x64
 Managed Hook allows you to hook any methods with a handler that is called before and after the hooked method is called. <br>
 Tested with X64 and X86 architecture with non-inlined methods. <br>
 (careful with optimized code with inlined methods, the pattern was not intended to be used in that case) <br>
