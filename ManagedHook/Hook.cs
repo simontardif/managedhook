@@ -357,32 +357,59 @@ namespace ManagedHook
             byte* functionPtr = (byte*)MethodPointer.ToPointer();
             byte* hookFunctionPtr = (byte*)HookFunctionPointer.ToPointer();
 
-            long functionPtrLong = MethodPointer.ToInt64();
+            long functionPtrLong32 = MethodPointer.ToInt32();
+            long functionPtrLong64 = MethodPointer.ToInt64();
 
-            if (functionPtrLong != 0)
+            if (functionPtrLong32 != 0)
             {
-                for (int i = 0; i < 15; ++i) // make a copy of the 5 bytes 
+                if (Isx64())
                 {
-                    _originalFunction[i] = functionPtr[i];
+                    for (int i = 0; i < 15; ++i) // make a copy of the 5 bytes 
+                    {
+                        _originalFunction[i] = functionPtr[i];
+                    }
+
+                    uint dwOldProtect;
+                    VirtualProtect(MethodPointer, 5, (uint)Protection.PAGE_EXECUTE_READWRITE, out dwOldProtect);
+
+                    *functionPtr = 0x48; //mov rbx, functionPointer
+                    functionPtr++;
+                    *functionPtr = 0xBB;
+                    functionPtr++;
+
+                    *(long*)(functionPtr) = functionPtrLong64;
+
+                    functionPtr += 8;
+
+                    *functionPtr = 0xE9; //jmp hookFunctionPointer
+                    functionPtr++;
+                    int jumpRelative = (int)hookFunctionPtr - (int)(functionPtr + 4);
+
+                    *(int*)(functionPtr) = jumpRelative;
                 }
+                else
+                {
+                    for (int i = 0; i < 15; ++i) // make a copy of the 5 bytes 
+                    {
+                        _originalFunction[i] = functionPtr[i];
+                    }
 
-                uint dwOldProtect;
-                VirtualProtect(MethodPointer, 5, (uint)Protection.PAGE_EXECUTE_READWRITE, out dwOldProtect);
+                    uint dwOldProtect;
+                    VirtualProtect(MethodPointer, 15, (uint)Protection.PAGE_EXECUTE_READWRITE, out dwOldProtect);
 
-                *functionPtr = 0x48; //mov rbx, functionPointer
-                functionPtr++;
-                *functionPtr = 0xBB;
-                functionPtr++;
+                    *functionPtr = 0xBB; //mov ebx, functionPointer
+                    functionPtr++;
 
-                *(long*)(functionPtr) = functionPtrLong;
+                    *(long*)(functionPtr) = functionPtrLong32;
 
-                functionPtr += 8;
+                    functionPtr += 4;
 
-                *functionPtr = 0xE9; //jmp hookFunctionPointer
-                functionPtr++;
-                int jumpRelative = (int)hookFunctionPtr - (int)(functionPtr + 4);
+                    *functionPtr = 0xE9; //jmp hookFunctionPointer
+                    functionPtr++;
+                    int jumpRelative = (int)hookFunctionPtr - (int)(functionPtr + 4);
 
-                *(int*)(functionPtr) = jumpRelative;
+                    *(int*)(functionPtr) = jumpRelative;
+                }
             }
         }
 
@@ -409,6 +436,8 @@ namespace ManagedHook
             //mov    rax,rbx
             return 0; // assembly: only ret (0xC3)
         }
+        
+        public bool Isx64() { return IntPtr.Size == 8; }
 
         #endregion
 
